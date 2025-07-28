@@ -24,7 +24,7 @@ class DatabaseSeeder extends Seeder
             'address' => 'Jalan Antara',
             'houseNumber' => 'Antara01',
             'phoneNumber' => '082287354040',
-            'city' => 'Bengkalis',
+            'city_id' => 1,
             'roles' => 'ADMIN',
             'picturePath' => null,
         ]);
@@ -37,12 +37,16 @@ class DatabaseSeeder extends Seeder
             'address' => 'Jalan Lurus',
             'houseNumber' => 'Lurus02',
             'phoneNumber' => '082123456789',
-            'city' => 'Pekanbaru',
+            'city_id' => 5,
             'roles' => 'USER',
             'picturePath' => null,
         ]);
 
         // Call ProductSeeder
-        $this->call(ProductSeeder::class);
+        $this->call([
+            ProductSeeder::class,
+            ZoneSeeder::class,
+            CitySeeder::class
+        ]);
     }
 }

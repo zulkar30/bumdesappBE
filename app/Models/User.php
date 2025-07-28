@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Carbon\Carbon;
 use App\Models\Cart;
+use App\Models\City;
 use App\Models\Review;
 use App\Models\Transaction;
 use Laravel\Sanctum\HasApiTokens;
@@ -34,7 +35,7 @@ class User extends Authenticatable
         'address',
         'houseNumber',
         'phoneNumber',
-        'city',
+        'city_id',
         'roles',
         'picturePath',
         'device_token'
@@ -84,6 +85,11 @@ class User extends Authenticatable
     public function carts()
     {
         return $this->hasMany(Cart::class);
+    }
+
+    public function city()
+    {
+        return $this->belongsTo(City::class);
     }
 
     public function getCreatedAtAttribute($value)

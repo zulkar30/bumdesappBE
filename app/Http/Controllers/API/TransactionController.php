@@ -9,6 +9,7 @@ use App\Models\Product;
 use App\Models\Transaction;
 use Illuminate\Http\Request;
 use App\Helpers\ResponseFormatter;
+use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 
@@ -22,7 +23,9 @@ class TransactionController extends Controller
         $status = $request->input('status');
 
         if ($id) {
-            $transaction = Transaction::with(['product', 'user'])->find($id);
+            $transaction = Transaction::where('id', $id)
+            ->with(['product', 'user.city.zone'])
+            ->first();
 
             if ($transaction) {
                 return ResponseFormatter::success($transaction, 'Transaction Datas succesfully taken');
@@ -31,8 +34,8 @@ class TransactionController extends Controller
             }
         }
 
-        $transaction = Transaction::with('product', 'user')
-            ->where('user_id', Auth::user()->id);
+         $transaction = Transaction::with(['product', 'user.city.zone'])
+        ->where('user_id', Auth::id());
 
         if ($product_id) {
             $transaction->where('product_id', $product_id);
@@ -126,4 +129,21 @@ class TransactionController extends Controller
             return ResponseFormatter::error($e->getMessage(), 'Transaksi gagal');
         }
     }
+
+    public function checkPurchase(Request $request)
+    {
+        $userId = $request->query('user_id');
+        $productId = $request->query('product_id');
+
+        $hasPurchased = DB::table('transactions')
+            ->where('user_id', $userId)
+            ->where('product_id', $productId)
+            ->where('status', 'success')
+            ->exists();
+
+        return response()->json([
+            'hasPurchased' => $hasPurchased
+        ]);
+    }
+
 }

@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\City;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ReviewController;
@@ -10,6 +11,7 @@ use App\Http\Controllers\API\MidtransController;
 use App\Http\Controllers\API\DeviceTokenController;
 use App\Http\Controllers\API\TransactionController;
 use App\Http\Controllers\API\NotificationController;
+use App\Http\Controllers\TransactionController as ControllersTransactionController;
 
 /*
 |--------------------------------------------------------------------------
@@ -28,6 +30,8 @@ Route::middleware('auth:sanctum')->group(function() {
     Route::post('user', [UserController::class, 'updateProfile']);
     Route::post('user/photo', [UserController::class, 'updatePhoto']);
     Route::post('logout', [UserController::class, 'logout']);
+    Route::get('shipping-price', [UserController::class, 'getShippingPrice']);
+
 
     // Device Token route
     Route::post('save-device-token', [DeviceTokenController::class, 'saveToken']);
@@ -59,3 +63,13 @@ Route::post('product/{productId}/review', [ReviewController::class, 'store'])->m
 
 // Midtrans route
 Route::post('midtrans/callback', [MidtransController::class, 'callback']);
+
+// Cek Pembelian
+Route::get('check-purchase', [TransactionController::class, 'checkPurchase']);
+
+// Ambil data kot
+Route::get('cities', function () {
+    return response()->json([
+        'data' => City::select('id', 'name')->get()
+    ]);
+});

@@ -26,7 +26,7 @@ return new class extends Migration
             $table->text('address')->nullable();
             $table->string('houseNumber')->nullable();
             $table->string('phoneNumber')->nullable();
-            $table->string('city')->nullable();
+            $table->integer('city_id');
 
             $table->string('roles')->default('USER');
 

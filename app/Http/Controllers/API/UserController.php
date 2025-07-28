@@ -41,7 +41,7 @@ class UserController extends Controller
             }
 
             // Jika hash/password tidak sesuai
-            $user = User::where('email', $request->email)->first();
+            $user = User::where('email', $request->email)->with('city')->first();
             if(!Hash::check($request->password, $user->password, [])) {
                 throw new \Exception('Invalid Credentials');
             }
@@ -80,7 +80,7 @@ class UserController extends Controller
                 'password' => Hash::make($request->password)
             ]);
 
-            $user = User::where('email', $request->email)->first();
+            $user = User::where('email', $request->email)->with('city')->first();
 
             $tokenResult = $user->createToken('authToken')->plainTextToken;
             return ResponseFormatter::success([
@@ -137,5 +137,18 @@ class UserController extends Controller
 
             return ResponseFormatter::success([$file], 'File successfully updated');
         }
+    }
+
+    public function getShippingPrice(Request $request)
+    {
+        $user = $request->user();
+
+        if (!$user->city || !$user->city->zone) {
+            return response()->json(['message' => 'Zona tidak ditemukan'], 404);
+        }
+
+        return response()->json([
+            'driver_price' => $user->city->zone->price,
+        ]);
     }
 }

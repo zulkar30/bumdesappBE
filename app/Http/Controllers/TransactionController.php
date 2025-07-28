@@ -160,4 +160,5 @@ class TransactionController extends Controller
 
         return view('transaction.receipt', compact('transaction'));
     }
+
 }
