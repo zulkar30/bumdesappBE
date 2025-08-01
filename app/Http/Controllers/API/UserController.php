@@ -76,7 +76,7 @@ class UserController extends Controller
                 'address' => $request->address,
                 'houseNumber' => $request->houseNumber,
                 'phoneNumber' => $request->phoneNumber,
-                'city' => $request->city,
+                'city_id' => $request->city_id,
                 'password' => Hash::make($request->password)
             ]);
 
