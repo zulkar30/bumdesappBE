@@ -95,22 +95,31 @@
                                     @endif
                                 </td>
                                 <td class="border px-6 py-4 text-center">
-                                    <a href="{{ route('transaction.show', $item->id) }}"
-                                        class="inline-block bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 mx-2 rounded">
-                                        Lihat
-                                    </a>
-                                    <a href="{{ route('transaction.printReceipt', $item->id) }}" target="_blank"
-                                        class="inline-block bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 mx-2 rounded">
-                                        Print Resi
-                                    </a>
-                                    <form action="{{ route('transaction.destroy', $item->id) }}" method="POST"
-                                        class="inline-block">
-                                        {!! method_field('delete') . csrf_field() !!}
-                                        <button type="submit"
-                                            class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 mx-2 rounded inline-block">
-                                            Hapus
-                                        </button>
-                                    </form>
+                                    <div class="flex justify-center">
+                                        <!-- Lihat -->
+                                        <a href="{{ route('transaction.show', $item->id) }}"
+                                            class="bg-blue-500 hover:bg-blue-700 text-white p-2 rounded mr-2"
+                                            title="Lihat">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+                                
+                                        <!-- Print Resi -->
+                                        <a href="{{ route('transaction.printReceipt', $item->id) }}" target="_blank"
+                                            class="bg-green-500 hover:bg-green-700 text-white p-2 rounded mr-2"
+                                            title="Print Resi">
+                                            <i class="fas fa-print"></i>
+                                        </a>
+                                
+                                        <!-- Hapus -->
+                                        <form action="{{ route('transaction.destroy', $item->id) }}" method="POST">
+                                            {!! method_field('delete') . csrf_field() !!}
+                                            <button type="submit"
+                                                class="bg-red-500 hover:bg-red-700 text-white p-2 rounded"
+                                                title="Hapus">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </form>
+                                    </div>
                                 </td>
                             </tr>
                         @empty

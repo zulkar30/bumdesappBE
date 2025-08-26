@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\User;
 use App\Models\Zone;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -18,4 +19,9 @@ class City extends Model
     {
         return $this->belongsTo(Zone::class);
     }
+
+    public function user()
+{
+    return $this->hasMany(User::class);
+}
 }

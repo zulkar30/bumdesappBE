@@ -11,7 +11,9 @@ use App\Http\Controllers\API\MidtransController;
 use App\Http\Controllers\API\DeviceTokenController;
 use App\Http\Controllers\API\TransactionController;
 use App\Http\Controllers\API\NotificationController;
+use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use App\Http\Controllers\TransactionController as ControllersTransactionController;
+use App\Http\Controllers\API\VerifyEmailApiController;
 
 /*
 |--------------------------------------------------------------------------
@@ -24,14 +26,13 @@ use App\Http\Controllers\TransactionController as ControllersTransactionControll
 |
 */
 
-Route::middleware('auth:sanctum')->group(function() {
+Route::middleware(['auth:sanctum', 'verified'])->group(function() {
     // User route
     Route::get('user', [UserController::class, 'fetch']);
     Route::post('user', [UserController::class, 'updateProfile']);
     Route::post('user/photo', [UserController::class, 'updatePhoto']);
     Route::post('logout', [UserController::class, 'logout']);
     Route::get('shipping-price', [UserController::class, 'getShippingPrice']);
-
 
     // Device Token route
     Route::post('save-device-token', [DeviceTokenController::class, 'saveToken']);
@@ -40,6 +41,9 @@ Route::middleware('auth:sanctum')->group(function() {
     Route::post('checkout', [TransactionController::class, 'checkout']);
     Route::get('transaction', [TransactionController::class, 'all']);
     Route::post('transaction/{id}', [TransactionController::class, 'update']);
+    // Cek Pembelian
+    Route::get('check-purchase', [TransactionController::class, 'checkPurchase']);
+
 
     // Keranjang route
     Route::get('cart', [CartController::class, 'getCartItems']); // Get cart items
@@ -64,12 +68,19 @@ Route::post('product/{productId}/review', [ReviewController::class, 'store'])->m
 // Midtrans route
 Route::post('midtrans/callback', [MidtransController::class, 'callback']);
 
-// Cek Pembelian
-Route::get('check-purchase', [TransactionController::class, 'checkPurchase']);
-
 // Ambil data kot
 Route::get('cities', function () {
     return response()->json([
         'data' => City::select('id', 'name')->get()
     ]);
 });
+
+// Verifikasi Email
+Route::get('/verify-email/{id}/{hash}', [VerifyEmailApiController::class, 'verify'])
+    ->middleware(['signed', 'throttle:6,1'])
+    ->name('verification.verify');
+
+Route::post('/email/verification-notification', function (Request $request) {
+    $request->user()->sendEmailVerificationNotification();
+    return response()->json(['message' => 'Verification link sent!']);
+})->middleware(['auth:sanctum', 'throttle:6,1'])->name('verification.send');

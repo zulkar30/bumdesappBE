@@ -53,14 +53,24 @@
                                 <td class="border px-6 py-4">{{ $item->types }}</td>
                                 <td class="border px-6 py-4">{{ $item->stock }}</td>
                                 <td class="border px-6 py-4 text-center">
-                                    <a href="{{ route('product.edit', $item->id) }}"
-                                        class="inline-block bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 mx-2 rounded">Edit</a>
-                                    <form action="{{ route('product.destroy', $item->id) }}" method="POST"
-                                        class="inline-block">
-                                        {!! method_field('delete') . csrf_field() !!}
-                                        <button
-                                            class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 mx-2 rounded">Hapus</button>
-                                    </form>
+                                    <div class="flex justify-center items-center ">
+                                        <!-- Edit -->
+                                        <a href="{{ route('product.edit', $item->id) }}"
+                                            class="bg-blue-500 hover:bg-blue-700 text-white p-2 rounded mr-2"
+                                            title="Edit">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                
+                                        <!-- Hapus -->
+                                        <form action="{{ route('product.destroy', $item->id) }}" method="POST">
+                                            {!! method_field('delete') . csrf_field() !!}
+                                            <button type="submit"
+                                                class="bg-red-500 hover:bg-red-700 text-white p-2 rounded"
+                                                title="Hapus">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </form>
+                                    </div>
                                 </td>
                             </tr>
                         @empty

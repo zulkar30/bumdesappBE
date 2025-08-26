@@ -16,6 +16,12 @@ class DatabaseSeeder extends Seeder
      */
     public function run()
     {
+        $this->call([
+            ProductSeeder::class,
+            ZoneSeeder::class,
+            CitySeeder::class
+        ]);
+
         // Create first user (Super Admin)
         User::factory()->create([
             'name' => 'Super Admin',
@@ -40,13 +46,6 @@ class DatabaseSeeder extends Seeder
             'city_id' => 5,
             'roles' => 'USER',
             'picturePath' => null,
-        ]);
-
-        // Call ProductSeeder
-        $this->call([
-            ProductSeeder::class,
-            ZoneSeeder::class,
-            CitySeeder::class
         ]);
     }
 }

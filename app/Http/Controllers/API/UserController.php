@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers\API;
 
-use App\Actions\Fortify\PasswordValidationRules;
 use Exception;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -10,7 +9,9 @@ use App\Helpers\ResponseFormatter;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Auth\Events\Registered;
 use Illuminate\Support\Facades\Validator;
+use App\Actions\Fortify\PasswordValidationRules;
 
 class UserController extends Controller
 {
@@ -33,17 +34,27 @@ class UserController extends Controller
             ]);
 
             // Cek credentials (login)
-            $credentials = $request->only('email', 'password');
-            if(!Auth::attempt($credentials)) {
-                return ResponseFormatter::error([
-                    'message' => 'Unauthorized'
-                ], 'Authentication Failed', 500);
-            }
+            // $credentials = $request->only('email', 'password');
+            // if(!Auth::attempt($credentials)) {
+            //     return ResponseFormatter::error([
+            //         'message' => 'Unauthorized'
+            //     ], 'Authentication Failed', 500);
+            // }
 
+            if (!Auth::attempt($request->only('email', 'password'))) {
+                return ResponseFormatter::error([
+                    'message' => 'Email atau password salah'
+                ], 'Login Gagal', 401);
+            }
+            
             // Jika hash/password tidak sesuai
             $user = User::where('email', $request->email)->with('city')->first();
-            if(!Hash::check($request->password, $user->password, [])) {
-                throw new \Exception('Invalid Credentials');
+
+            // Cek apakah user sudah verifikasi email
+            if (is_null($user->email_verified_at)) {
+                return ResponseFormatter::error([
+                    'message' => 'Email belum diverifikasi'
+                ], 'Email Not Verified', 403);
             }
 
             // Jika data benar
@@ -55,9 +66,9 @@ class UserController extends Controller
             ], 'Authenticated');
         } catch(Exception $error) {
             return ResponseFormatter::error([
-                'message' => 'Something went wrong',
+                'message' => 'Ada sesuatau yang salah',
                 'error' => $error
-            ], 'Authentication Failed', 500);
+            ], 'Login Gagal', 500);
         }
     }
 
@@ -70,7 +81,7 @@ class UserController extends Controller
                 'password' => $this->passwordRules()
             ]);
 
-            User::create([
+            $user = User::create([
                 'name' => $request->name,
                 'email' => $request->email,
                 'address' => $request->address,
@@ -80,19 +91,18 @@ class UserController extends Controller
                 'password' => Hash::make($request->password)
             ]);
 
-            $user = User::where('email', $request->email)->with('city')->first();
+            // Kirim email verifikasi
+            event(new Registered($user));
 
-            $tokenResult = $user->createToken('authToken')->plainTextToken;
             return ResponseFormatter::success([
-                'access_token' => $tokenResult,
-                'token_type' => 'Bearer',
-                'user' => $user
-            ], 'Authenticated');
+                'message' => 'Pendaftaran berhasil. Silakan cek email Anda untuk verifikasi sebelum login.'
+            ], 'Register Success, Verification Email Sent');
+
         } catch(Exception $error) {
             return ResponseFormatter::error([
                 'message' => 'Something went wrong',
-                'error' => $error
-            ], 'Authentication Failed', 500);
+                'error' => $error->getMessage()
+            ], 'Register Failed', 500);
         }
     }
 
@@ -123,7 +133,7 @@ class UserController extends Controller
         {
             return ResponseFormatter::error([
                 'error' => $validator->errors()
-            ], 'Update photo fails', 401);
+            ], 'Update foto gagal', 401);
         }
 
         if($request->file('file'))
@@ -135,7 +145,7 @@ class UserController extends Controller
             $user->picturePath = $file;
             $user->update();
 
-            return ResponseFormatter::success([$file], 'File successfully updated');
+            return ResponseFormatter::success([$file], 'Foto profil berhasil di upload');
         }
     }
 
@@ -151,4 +161,5 @@ class UserController extends Controller
             'driver_price' => $user->city->zone->price,
         ]);
     }
+
 }

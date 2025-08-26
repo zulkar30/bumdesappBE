@@ -132,13 +132,13 @@ class TransactionController extends Controller
 
     public function checkPurchase(Request $request)
     {
-        $userId = $request->query('user_id');
+        $userId = $request->user()->id;
         $productId = $request->query('product_id');
 
         $hasPurchased = DB::table('transactions')
             ->where('user_id', $userId)
             ->where('product_id', $productId)
-            ->where('status', 'success')
+            ->where('status', 'delivered')
             ->exists();
 
         return response()->json([

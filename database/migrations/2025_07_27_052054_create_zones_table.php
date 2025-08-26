@@ -16,7 +16,7 @@ return new class extends Migration
         Schema::create('zones', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->string('price');
+            $table->decimal('price', 10, 2);
             $table->timestamps();
         });
     }

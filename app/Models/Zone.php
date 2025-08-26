@@ -15,7 +15,7 @@ class Zone extends Model
         'price',
     ];
 
-    public function cities()
+    public function city()
     {
         return $this->hasMany(City::class);
     }
